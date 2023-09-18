@@ -12,7 +12,8 @@
 	compatible = "seawo,sv21", "rockchip,rk3568";
 
 	aliases {
-		ethernet0 = &gmac1;
+		ethernet0 = &gmac0;
+		ethernet1 = &gmac1;
 		mmc0 = &sdmmc0;
 		mmc1 = &sdhci;
 	};
@@ -136,6 +137,7 @@
 		compatible = "regulator-fixed";
 		enable-active-high;
 		gpio = <&gpio0 RK_PA5 GPIO_ACTIVE_HIGH>;
+		//all seewo ctrl gpio set here。
 		pinctrl-names = "default";
 		pinctrl-0 = <&vcc5v0_usb_otg_en>;
 		regulator-name = "vcc5v0_usb_otg";
@@ -203,6 +205,22 @@
 
 &cpu3 {
 	cpu-supply = <&vdd_cpu>;
+};
+
+&gmac0 {
+	assigned-clocks = <&cru SCLK_GMAC0_RX_TX>, <&cru SCLK_GMAC0>;
+	assigned-clock-parents = <&cru SCLK_GMAC0_RGMII_SPEED>;
+	assigned-clock-rates = <0>, <125000000>;
+	clock_in_out = "output";
+	phy-handle = <&rgmii_phy0>;
+	phy-mode = "rgmii-id";
+	pinctrl-names = "default";
+	pinctrl-0 = <&gmac0_miim
+		     &gmac0_tx_bus2
+		     &gmac0_rx_bus2
+		     &gmac0_rgmii_clk
+		     &gmac0_rgmii_bus>;
+	status = "disabled";
 };
 
 &gmac1 {
@@ -527,6 +545,13 @@
 	status = "okay";
 };
 
+&mdio0 {
+	rgmii_phy0: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0x0>;
+	};
+};
+
 &mdio1 {
 	rgmii_phy1: ethernet-phy@0 {
 		compatible = "ethernet-phy-ieee802.3-c22";
@@ -539,6 +564,7 @@
 	};
 };
 
+//zhb  this should del for sata3
 &pcie2x1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pcie_reset_h>;
@@ -546,6 +572,10 @@
 	vpcie3v3-supply = <&vcc3v3_pcie>;
 	status = "okay";
 };
+
+// &sata2 {
+// 	status = "okay";
+// };
 
 &pinctrl {
 	cam {
@@ -603,7 +633,8 @@
 			rockchip,pins = <0 RK_PD5 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 		vcc5v0_usb_otg_en: vcc5v0_usb_otg_en {
-			rockchip,pins = <0 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>;
+			rockchip,pins = <0 RK_PA5 RK_FUNC_GPIO &pcfg_pull_none>,
+							<3 RK_PC6 RK_FUNC_GPIO &pcfg_output_high>;
 		};
 	};
 };
@@ -668,8 +699,10 @@
 	status = "okay";
 };
 
+// zhb usb3.0 otg  mode host
 &usb_host0_xhci {
 	extcon = <&usb2phy0>;
+	dr_mode = "host";
 	status = "okay";
 };
 
@@ -681,7 +714,12 @@
 	status = "okay";
 };
 
+// for rtl8153
 &usb_host1_xhci {
+	phys = <&usb2phy0_host>;
+	phy-names = "usb2-phy";
+	maximum-speed = "high-speed";
+	extcon = <&usb2phy0>;
 	status = "okay";
 };
 
@@ -709,7 +747,7 @@
 };
 
 &usb2phy1_otg {
-	phy-supply = <&vcc5v0_usb_host>;
+	phy-supply = <&vcc5v0_usb_otg>;
 	status = "okay";
 };
 
