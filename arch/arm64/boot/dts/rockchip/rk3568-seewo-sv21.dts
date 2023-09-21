@@ -224,6 +224,7 @@
 };
 
 &gmac1 {
+	local-mac-address = [bc 6b ff 42 31 75];
 	assigned-clocks = <&cru SCLK_GMAC1_RX_TX>, <&cru SCLK_GMAC1>;
 	assigned-clock-parents = <&cru SCLK_GMAC1_RGMII_SPEED>;
 	assigned-clock-rates = <0>, <125000000>;
@@ -235,11 +236,12 @@
 		     &gmac1m1_rx_bus2
 		     &gmac1m1_rgmii_clk
 		     &gmac1m1_rgmii_bus>;
-	snps,reset-gpio = <&gpio3 RK_PB0 GPIO_ACTIVE_LOW>;
+	snps,reset-gpio = <&gpio2 RK_PD1 GPIO_ACTIVE_HIGH>;//0x19->25  24 d0 25 d1
 	snps,reset-active-high;
 	snps,reset-delays-us = <0 1000000 2000000>;
 	tx_delay = <0x2a>;
 	rx_delay = <0x2a>;
+	fixed-link = <1 1 1000 1 1>;
 	phy-handle = <&rgmii_phy1>;
 	status = "okay";
 };
