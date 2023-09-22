@@ -32,7 +32,7 @@
 			};
 		};
 	};
-
+/*
 	leds {
 		compatible = "gpio-leds";
 
@@ -45,7 +45,7 @@
 			pinctrl-0 = <&led_user_en>;
 		};
 	};
-
+*/
 	rk809-sound {
 		compatible = "simple-audio-card";
 		simple-audio-card,format = "i2s";
@@ -566,17 +566,17 @@
 };
 
 //zhb  this should del for sata3
-&pcie2x1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pcie_reset_h>;
-	reset-gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
-	vpcie3v3-supply = <&vcc3v3_pcie>;
-	status = "okay";
-};
-
-// &sata2 {
+// &pcie2x1 {
+// 	pinctrl-names = "default";
+// 	pinctrl-0 = <&pcie_reset_h>;
+// 	reset-gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
+// 	vpcie3v3-supply = <&vcc3v3_pcie>;
 // 	status = "okay";
 // };
+
+&sata2 {
+	status = "okay";
+};
 
 &pinctrl {
 	cam {
@@ -605,7 +605,7 @@
 
 	leds {
 		led_user_en: led_user_en {
-			rockchip,pins = <0 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
+			rockchip,pins = <0 RK_PB7 RK_FUNC_GPIO &pcfg_output_high>;
 		};
 	};
 
@@ -734,7 +734,7 @@
 };
 
 &usb2phy0_otg {
-	phy-supply = <&vcc5v0_usb_otg>;
+	vbus-supply = <&vcc5v0_usb_otg>;
 	status = "okay";
 };
 
