@@ -717,10 +717,6 @@
 
 // for rtl8153
 &usb_host1_xhci {
-	phys = <&usb2phy0_host>;
-	phy-names = "usb2-phy";
-	maximum-speed = "high-speed";
-	extcon = <&usb2phy0>;
 	status = "okay";
 };
 
