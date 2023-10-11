@@ -99,5 +99,7 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-watermelon-pi.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-seewo-sv21.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-luban-jixiang.dtb
 dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-caimore-59f.dtb
+dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-xiyun.dtb
+dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3399-maxhub-tw07b.dtb
 
 subdir-y       := $(dts-dirs) overlay
