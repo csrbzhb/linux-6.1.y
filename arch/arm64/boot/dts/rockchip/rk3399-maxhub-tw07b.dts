@@ -242,7 +242,7 @@
 	phy-supply = <&vcc_lan>;
 	phy-mode = "rmii";
 	pinctrl-names = "default";
-	pinctrl-0 = <&rmii-pins>;
+	pinctrl-0 = <&rmii_pins>;
 	snps,reset-gpio = <&gpio3 RK_PA3 GPIO_ACTIVE_LOW>;
 	snps,reset-active-low;
 	snps,reset-delays-us = <0 10000 50000>;
@@ -271,7 +271,7 @@
 	mipi_panel: panel@0 {
 		compatible = "panel-dsi-simple";
 		reg = <0>;
-		avdd-supply = <&avdd>;
+		// avdd-supply = <&vcc3v3_s0>;
 		backlight = <&backlight>;
 		dvdd-supply = <&vcc3v3_s0>;
 
