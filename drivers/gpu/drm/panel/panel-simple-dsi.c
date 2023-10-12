@@ -94,6 +94,10 @@ struct panel_simple {
 
 	struct gpio_desc *enable_gpio;
 	struct gpio_desc *reset_gpio;
+	struct gpio_desc *lcd_gpio;
+	struct gpio_desc *vcc_gpio;
+	struct gpio_desc *stb_gpio;
+	struct gpio_desc *ldoen_gpio;
 	int cmd_type;
 
 	struct panel_cmds *on_cmds;
@@ -409,7 +413,14 @@ static int panel_simple_unprepare(struct drm_panel *panel)
 
 	if (p->enable_gpio)
 		gpiod_direction_output(p->enable_gpio, 0);
-
+	if (p->lcd_gpio)
+		gpiod_direction_output(p->lcd_gpio, 0);
+	if (p->vcc_gpio)
+		gpiod_direction_output(p->vcc_gpio, 0);
+	if (p->stb_gpio)
+		gpiod_direction_output(p->stb_gpio, 0);
+	if (p->ldoen_gpio)
+		gpiod_direction_output(p->ldoen_gpio, 0);
 	panel_simple_regulator_disable(panel);
 
 	if (p->desc && p->desc->delay.unprepare)
@@ -436,7 +447,14 @@ static int panel_simple_prepare(struct drm_panel *panel)
 
 	if (p->enable_gpio)
 		gpiod_direction_output(p->enable_gpio, 1);
-
+	if (p->lcd_gpio)
+		gpiod_direction_output(p->lcd_gpio, 1);
+	if (p->vcc_gpio)
+		gpiod_direction_output(p->vcc_gpio, 1);
+	if (p->stb_gpio)
+		gpiod_direction_output(p->stb_gpio, 1);
+	if (p->ldoen_gpio)
+		gpiod_direction_output(p->ldoen_gpio, 1);
 	if (p->desc && p->desc->delay.prepare)
 		panel_simple_sleep(p->desc->delay.prepare);
 
@@ -577,6 +595,27 @@ static int panel_simple_probe(struct device *dev, const struct panel_desc *desc)
 		return err;
 	}
 
+	panel->lcd_gpio = devm_gpiod_get_optional(dev, "lcd", 0);
+	if (IS_ERR(panel->lcd_gpio)) {
+		err = PTR_ERR(panel->lcd_gpio);
+		dev_info(dev, "failed to request lcd GPIO: %d\n", err);
+	}
+	panel->vcc_gpio = devm_gpiod_get_optional(dev, "vcc", 0);
+	if (IS_ERR(panel->vcc_gpio)) {
+		err = PTR_ERR(panel->vcc_gpio);
+		dev_info(dev, "failed to request vcc GPIO: %d\n", err);
+	}
+	panel->stb_gpio = devm_gpiod_get_optional(dev, "stb", 0);
+	if (IS_ERR(panel->stb_gpio)) {
+		err = PTR_ERR(panel->stb_gpio);
+		dev_info(dev, "failed to request stb GPIO: %d\n", err);
+	}
+	panel->ldoen_gpio = devm_gpiod_get_optional(dev, "ldoen", 0);
+	if (IS_ERR(panel->ldoen_gpio)) {
+		err = PTR_ERR(panel->ldoen_gpio);
+		dev_info(dev, "failed to request ldoen GPIO: %d\n", err);
+	}
+
 	panel->reset_gpio = devm_gpiod_get_optional(dev, "reset", 0);
 	if (IS_ERR(panel->reset_gpio)) {
 		err = PTR_ERR(panel->reset_gpio);
@@ -642,7 +681,14 @@ static void panel_simple_shutdown(struct device *dev)
 
 		if (panel->enable_gpio)
 			gpiod_direction_output(panel->enable_gpio, 0);
-
+		if (panel->lcd_gpio)
+			gpiod_direction_output(panel->lcd_gpio, 0);
+		if (panel->vcc_gpio)
+			gpiod_direction_output(panel->vcc_gpio, 0);
+		if (panel->stb_gpio)
+			gpiod_direction_output(panel->stb_gpio, 0);
+		if (panel->ldoen_gpio)
+			gpiod_direction_output(panel->ldoen_gpio, 0);
 		panel_simple_regulator_disable(&panel->base);
 	}
 }
