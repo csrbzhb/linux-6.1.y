@@ -93,19 +93,80 @@
 			240 241 242 243 244 245 246 247
 			248 249 250 251 252 253 254 255>;
 		default-brightness-level = <200>;
-		enable-gpios = <&gpio1 RK_PB5 GPIO_ACTIVE_HIGH>;
-		pwms = <&pwm0 0 25000 0>;
+		enable-gpios = <&gpio4 RK_PD2 GPIO_ACTIVE_HIGH>;//0x1a->26 24d0 25d1 26d2
+		pwms = <&pwm0 0 25000 1>;
+		status = "okay";
+	};
+	backlight1: backlight1 {
+		compatible = "pwm-backlight";
+		brightness-levels = <
+			  0   1   2   3   4   5   6   7
+			  8   9  10  11  12  13  14  15
+			 16  17  18  19  20  21  22  23
+			 24  25  26  27  28  29  30  31
+			 32  33  34  35  36  37  38  39
+			 40  41  42  43  44  45  46  47
+			 48  49  50  51  52  53  54  55
+			 56  57  58  59  60  61  62  63
+			 64  65  66  67  68  69  70  71
+			 72  73  74  75  76  77  78  79
+			 80  81  82  83  84  85  86  87
+			 88  89  90  91  92  93  94  95
+			 96  97  98  99 100 101 102 103
+			104 105 106 107 108 109 110 111
+			112 113 114 115 116 117 118 119
+			120 121 122 123 124 125 126 127
+			128 129 130 131 132 133 134 135
+			136 137 138 139 140 141 142 143
+			144 145 146 147 148 149 150 151
+			152 153 154 155 156 157 158 159
+			160 161 162 163 164 165 166 167
+			168 169 170 171 172 173 174 175
+			176 177 178 179 180 181 182 183
+			184 185 186 187 188 189 190 191
+			192 193 194 195 196 197 198 199
+			200 201 202 203 204 205 206 207
+			208 209 210 211 212 213 214 215
+			216 217 218 219 220 221 222 223
+			224 225 226 227 228 229 230 231
+			232 233 234 235 236 237 238 239
+			240 241 242 243 244 245 246 247
+			248 249 250 251 252 253 254 255>;
+		default-brightness-level = <200>;
+		// enable-gpios = <&gpio4 RK_PD2 GPIO_ACTIVE_HIGH>;//0x1a->26 24d0 25d1 26d2
+		pwms = <&pwm1 0 25000 1>;
 		status = "okay";
 	};
 
 	edp_panel: edp-panel {
-		compatible = "lg,lp079qx1-sp0v";
+		compatible = "panel-simple";
 		backlight = <&backlight>;
-		enable-gpios = <&gpio4 RK_PC6 GPIO_ACTIVE_HIGH>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&lcd_panel_reset>;
+		enable-gpios = <&gpio4 RK_PC5 GPIO_ACTIVE_HIGH>;//0x15->21 16c0 17c1 18c2 19c3 20c4  21c5
+		// pinctrl-names = "default";
+		// pinctrl-0 = <&lcd_panel_reset>;
+		prepare-delay-ms = <200>;
+        enable-delay-ms = <200>;
 		power-supply = <&vcc3v3_s0>;
+		status = "okay";
 
+		display-timings {
+            native-mode = <&timing0>;
+            timing0: timing0 {
+                clock-frequency = <96000000>;
+                hactive = <1600>;
+                vactive = <900>;
+                hfront-porch = <148>;
+                hsync-len = <80>;
+                hback-porch = <180>;
+                vfront-porch = <60>;
+                vsync-len = <20>;
+                vback-porch = <80>;
+                hsync-active = <0>;
+                vsync-active = <0>;
+                de-active = <0>;
+                pixelclk-active = <0>;
+            };
+        };
 		port {
 			panel_in_edp: endpoint {
 				remote-endpoint = <&edp_out_panel>;
@@ -346,38 +407,49 @@
 	status = "okay";
 };
 
+&cdn_dp{
+	status = "okay";
+	
+	dp_out: port@1 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x1>;
+		dp_out_panel:endpoint {
+			remote-endpoint = <&panel_in_dp>;
+		};
+	};
+};
 
-// panel:panel {
-// 	compatible = "simple-panel";
-// 	backlight = <0x000000e7>;
-// 	enable-gpios = <0x00000040 0x00000015 0x00000000>;gpio4
-// 	prepare-delay-ms = <0x000000c8>;
-// 	enable-delay-ms = <0x000000c8>;
-// 	display-timings {
-// 		native-mode = <0x000000e8>;
-// 		timing0 {
-// 			clock-frequency = <0x05b8d800>;
-// 			hactive = <0x00000640>;
-// 			vactive = <0x00000384>;
-// 			hfront-porch = <0x00000094>;
-// 			hsync-len = <0x00000050>;
-// 			hback-porch = <0x000000b4>;
-// 			vfront-porch = <0x0000003c>;
-// 			vsync-len = <0x00000014>;
-// 			vback-porch = <0x00000050>;
-// 			hsync-active = <0x00000000>;
-// 			vsync-active = <0x00000000>;
-// 			de-active = <0x00000000>;
-// 			pixelclk-active = <0x00000000>;
-// 			phandle = <0x000000e8>;
-// 		};
-// 	};
-// 	ports {
-// 		endpoint {
-// 			remote-endpoint = <0x000000e9>;
-// 			phandle = <0x000000c0>;
-// 		};
-// 	};
-// };
+dppanel: panel {
+	compatible = "panel-simple";
+	enable-gpios = <&gpio4 RK_PD5 GPIO_ACTIVE_HIGH>;//1d->29  24d0 25d1 26d2 27d3 28d4 29d5 gpio4
+	enable1-gpios = <&gpio4 RK_PA5 GPIO_ACTIVE_HIGH>;
+	prepare-delay-ms = <100>;
+	bpc = <8>;
+	bus-format = <0x1015>;
+	display-timings {
+		native-mode = <&timing1>;
+		timing1: timing1 {
+			clock-frequency = <96000000>;
+			hactive = <1600>;
+			vactive = <900>;
+			hfront-porch = <48>;
+			hsync-len = <32>;
+			hback-porch = <80>;
+			vfront-porch = <6>;
+			vsync-len = <10>;
+			vback-porch = <15>;
+			hsync-active = <0>;
+			vsync-active = <0>;
+			de-active = <0>;
+			pixelclk-active = <0>;
+		};
+	};
+	port {
+		panel_in_dp:endpoint {
+			remote-endpoint = <&dp_out_panel>;
+		};
+	};
+};
 
 //驱动适配步骤：1,lcd 2,eth 3,touch 4,i2c 5,sound 6,wifi-bt pcie sata usb gpiokey
