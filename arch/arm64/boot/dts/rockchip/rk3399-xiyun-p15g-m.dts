@@ -46,6 +46,17 @@
 		};
 	};
 
+    rockchip-key {
+        compatible = "gpio-keys";
+        status = "okay";
+        power-key {
+            gpios = <&gpio0 RK_PA5 GPIO_ACTIVE_LOW>;
+            linux,code = <0x74>;
+            label = "power";
+            gpio-key,wakeup;
+        };
+    };
+
 	backlight: backlight {
 		compatible = "pwm-backlight";
 		brightness-levels = <
@@ -123,6 +134,30 @@
 		};
 	};
 
+	es8388-sound {
+		status = "okay";
+		compatible = "simple-audio-card";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,name = "rockchip,es8388-codec";
+		simple-audio-card,mclk-fs = <256>;
+		simple-audio-card,cpu {
+			sound-dai = <&i2s0>;
+			system-clock-frequency = <11289600>;
+		};
+		simple-audio-card,codec {
+			sound-dai = <&es8388>;
+			system-clock-frequency = <11289600>;
+		};
+	};
+
+	//摄像头声音输入
+    hdmiin-sound {
+        compatible = "rockchip,rockchip-rt5651-tc358749x-sound";
+        rockchip,cpu = <&i2s0>;
+        rockchip,codec = <&rt5651 &rt5651 &tc358749x>;
+        status = "okay";
+    };
+
 	sdio_pwrseq: sdio-pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		clocks = <&rk808 1>;
@@ -156,20 +191,56 @@
 		};
 	};
 };
+&i2c0 {
+	status = "okay";
+
+	rtc@51 {
+		compatible = "rtc,hym8563";
+		reg = <0x51>;
+	};
+};
 
 &i2c1 {
 	i2c-scl-rising-time-ns = <300>;
 	i2c-scl-falling-time-ns = <15>;
 	status = "okay";
 
+	es8388: es8388@11 {
+		#sound-dai-cells = <0>;
+		compatible = "everest,es8388";
+		reg = <0x11>;
+		clocks = <&cru SCLK_I2S_8CH_OUT>;
+		clock-names = "mclk";
+		pinctrl-names = "default";
+		pinctrl-0 = <0x0000003f>;
+		spk-con-gpio = <&gpio0 RK_PB3 GPIO_ACTIVE_HIGH>;//b->11 8b0 9b1 10b2 11b3 gpio0 
+		hp-det-gpio = <&gpio4 RK_PD4 GPIO_ACTIVE_HIGH>;//1c->28 24pd0 25pd1 26pd2 27pd3 28pd4 gpio4
+		status = "okay";
+	};
 	rt5651: rt5651@1a {
+		#sound-dai-cells = <0>;
 		compatible = "rockchip,rt5651";
 		reg = <0x1a>;
 		clocks = <&cru SCLK_I2S_8CH_OUT>;
 		clock-names = "mclk";
 		hp-det-gpio = <&gpio4 RK_PC4 GPIO_ACTIVE_LOW>;
 		spk-con-gpio = <&gpio0 RK_PB3 GPIO_ACTIVE_HIGH>;
-		#sound-dai-cells = <0>;
+	};
+
+	//摄像头声音输入通道，没用且没驱动
+	tc358749x: tc358749x@f {
+		compatible = "toshiba,tc358749x";
+		reg = <0xf>;
+		power-gpios = <&gpio2 RK_PA6 GPIO_ACTIVE_HIGH>;
+		power18-gpios = <&gpio2 RK_PB1 GPIO_ACTIVE_HIGH>;//8b0 9b1gpio2
+		power33-gpios = <&gpio2 RK_PA5 GPIO_ACTIVE_HIGH>;
+		csi-ctl-gpios = <&gpio2 RK_PB2 GPIO_ACTIVE_HIGH>;//a->10 10b2gpio2
+		stanby-gpios = <&gpio2 RK_PB0 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio2 RK_PA7 GPIO_ACTIVE_HIGH>;
+		int-gpios = <&gpio2 RK_PB4 GPIO_ACTIVE_HIGH>;//c->12 11b3 12b4 gpio2
+		pinctrl-names = "default";
+		pinctrl-0 = <&hdmiin_gpios>;
+		status = "okay";
 	};
 };
 
@@ -183,6 +254,33 @@
 		reg = <0x68>;
 		interrupt-parent = <&gpio1>;
 		interrupts = <RK_PC6 IRQ_TYPE_EDGE_RISING>;
+	};
+};
+
+&i2c6 {
+	status = "okay";
+	goodix@5d {
+		compatible = "Goodix,GT928";
+		reg = <0x5d>;
+		tp-size = <911>;
+		max-x = <1920>;
+		max-y = <1080>;
+		configfile-num = <10>;
+		irq_gpio_number = <&gpio2 RK_PA5 GPIO_SINGLE_ENDED>;
+		rst_gpio_number = <&gpio2 RK_PA6 GPIO_ACTIVE_LOW>;
+	};
+};
+&i2c7 {
+	status = "okay";
+	goodix_zhu@5d {
+		compatible = "Goodix,GT928_zhu";
+		reg = <0x5d>;
+		tp-size = <911>;
+		max-x = <1920>;
+		max-y = <1080>;
+		configfile-num = <10>;
+		irq_gpio_number = <&gpio2 RK_PA3 GPIO_SINGLE_ENDED>;
+		rst_gpio_number = <&gpio2 RK_PA4 GPIO_ACTIVE_LOW>;
 	};
 };
 
@@ -216,6 +314,17 @@
 			rockchip,pins = <4 RK_PD6 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
+	hdmiin {
+		hdmiin_gpios:hdmiin-gpios {
+			rockchip,pins = 
+			<2 RK_PA5 0 &pcfg_pull_none>,
+			<2 RK_PA6 0 &pcfg_pull_none>,
+			<2 RK_PA7 0 &pcfg_pull_none>,
+			<2 RK_PB0 0 &pcfg_pull_none>,
+			<2 RK_PB1 0 &pcfg_pull_none>,
+			<2 RK_PB4 0 &pcfg_pull_none>;
+		};
+	};
 };
 
 &sdio0 {
@@ -236,3 +345,39 @@
 &spdif {
 	status = "okay";
 };
+
+
+// panel:panel {
+// 	compatible = "simple-panel";
+// 	backlight = <0x000000e7>;
+// 	enable-gpios = <0x00000040 0x00000015 0x00000000>;gpio4
+// 	prepare-delay-ms = <0x000000c8>;
+// 	enable-delay-ms = <0x000000c8>;
+// 	display-timings {
+// 		native-mode = <0x000000e8>;
+// 		timing0 {
+// 			clock-frequency = <0x05b8d800>;
+// 			hactive = <0x00000640>;
+// 			vactive = <0x00000384>;
+// 			hfront-porch = <0x00000094>;
+// 			hsync-len = <0x00000050>;
+// 			hback-porch = <0x000000b4>;
+// 			vfront-porch = <0x0000003c>;
+// 			vsync-len = <0x00000014>;
+// 			vback-porch = <0x00000050>;
+// 			hsync-active = <0x00000000>;
+// 			vsync-active = <0x00000000>;
+// 			de-active = <0x00000000>;
+// 			pixelclk-active = <0x00000000>;
+// 			phandle = <0x000000e8>;
+// 		};
+// 	};
+// 	ports {
+// 		endpoint {
+// 			remote-endpoint = <0x000000e9>;
+// 			phandle = <0x000000c0>;
+// 		};
+// 	};
+// };
+
+//驱动适配步骤：1,lcd 2,eth 3,touch 4,i2c 5,sound 6,wifi-bt pcie sata usb gpiokey

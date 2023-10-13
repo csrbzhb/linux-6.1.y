@@ -46,6 +46,18 @@
 		};
 	};
 
+    rockchip-key {
+        compatible = "gpio-keys";
+        status = "okay";
+        io-channels = <&saradc 1>;
+        power-key {
+            gpios = <&gpio0 RK_PA5 GPIO_ACTIVE_LOW>;
+            linux,code = <0x74>;
+            label = "power";
+            gpio-key,wakeup;
+        };
+    };
+
 	backlight: backlight {
 		compatible = "pwm-backlight";
 		brightness-levels = <
