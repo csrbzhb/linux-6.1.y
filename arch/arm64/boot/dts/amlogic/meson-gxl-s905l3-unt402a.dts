@@ -17,6 +17,23 @@
 		reg = <0x0 0x0 0x0 0x80000000>;
 	};
 
+	partitions {
+		parts = <2>;
+		part-0 = <&fat>;
+		part-1 = <&rootfs>;
+
+		fat:fat {
+			pname = "fat";
+			size = <0x0 0x20000000>;
+			mask = <0x1>;
+		};
+
+		rootfs:rootfs {
+			pname = "rootfs";
+			size = <0xffffffff 0xffffffff>;
+			mask = <0x4>;
+		};
+	};
 };
 
 // the gpu in the S905L2 has one pp core less
