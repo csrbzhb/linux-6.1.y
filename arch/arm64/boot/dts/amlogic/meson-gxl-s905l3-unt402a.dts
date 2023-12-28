@@ -19,9 +19,14 @@
 
 	partitions {
 		parts = <2>;
-		part-0 = <&fat>;
-		part-1 = <&rootfs>;
-
+		part-0 = <&logo>;
+		part-1 = <&fat>;
+		part-2 = <&rootfs>;
+		logo:logo {
+			pname = "logo";
+			size = <0x0 0x400000>;
+			mask = <0x1>;
+		};
 		fat:fat {
 			pname = "fat";
 			size = <0x0 0x20000000>;
