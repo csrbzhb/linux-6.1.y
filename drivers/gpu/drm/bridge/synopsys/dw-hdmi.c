@@ -3495,8 +3495,8 @@ struct dw_hdmi *dw_hdmi_probe(struct platform_device *pdev,
 	    (prod_id1 & ~HDMI_PRODUCT_ID1_HDCP) != HDMI_PRODUCT_ID1_HDMI_TX) {
 		dev_err(dev, "Unsupported HDMI controller (%04x:%02x:%02x)\n",
 			hdmi->version, prod_id0, prod_id1);
-		ret = -ENODEV;
-		goto err_iahb;
+		// ret = -ENODEV;
+		// goto err_iahb;
 	}
 
 	ret = dw_hdmi_detect_phy(hdmi);
